@@ -1,0 +1,17 @@
+FROM node:14-alpine
+
+WORKDIR /usr/src/app
+
+RUN apk update && apk upgrade
+RUN apk add git
+
+COPY ./package.json ./
+
+RUN npm install
+
+COPY ./ ./
+
+ENV HOST=0.0.0.0
+ENV PORT=3000
+
+CMD ["npm", "run", "dev"]

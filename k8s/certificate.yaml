@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: hughmaltby-com-tls
+spec:
+  secretName: hughmaltby-com
+  issuerRef:
+    name: letsencrypt-prod
+    kind: ClusterIssuer
+  commonName: hughmaltby.com
+  dnsNames:
+    - hughmaltby.com
+    - www.hughmaltby.com

@@ -1,0 +1,78 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: api-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: api
+  template:
+    metadata:
+      labels:
+        component: api
+    spec:
+      containers:
+        - name: api
+          image: maltbyhugh/k8s-api:example
+          ports:
+            - containerPort: 9000
+          env:
+            - name: APP_NAME
+              value: api
+            - name: APP_ENV
+              value: production
+            - name: APP_DEBUG
+              value: "false"
+            - name: APP_URL
+              value: http://localhost:8080
+            - name: LOG_CHANNEL
+              value: stack
+            - name: LOG_LEVEL
+              value: debug
+            - name: DB_CONNECTION
+              value: postgres
+            - name: DB_HOST
+              value: postgres-cluster-ip-service
+            - name: DB_PORT
+              value: '5432'
+            - name: DB_DATABASE
+              value: postgres
+            - name: DB_USERNAME
+              value: postgres
+            - name: DB_PASSWORD
+              value: password
+              # valueFrom:
+              #   secretKeyRef:
+              #     name: pgpassword
+              #     key: PGPASSWORD
+            - name: BROADCAST_DRIVER
+              value: log
+            - name: CACHE_DRIVER
+              value: file
+            - name: FILESYSTEM_DRIVER
+              value: local
+            - name: QUEUE_CONNECTION
+              value: sync
+            - name: SESSION_DRIVER
+              value: file
+            - name: SESSION_LIFETIME
+              value: "120"
+            - name: REDIS_HOST
+              value: redis-cluster-ip-service
+            - name: REDIS_PASSWORD
+              value: null
+            - name: REDIS_PORT
+              value: "6379"
+            - name: MAIL_MAILER
+              value: smtp
+            - name: MAIL_HOST
+              value: smtp.mailtrap.io
+            - name: MAIL_PORT
+              value: "2525"
+            - name: MAIL_USERNAME
+              value: null
+            - name: MAIL_PASSWORD
+              value: null
+            - name: MAIL_ENCRYPTION
+              value: null

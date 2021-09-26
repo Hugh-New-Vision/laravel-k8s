@@ -1,0 +1,122 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-service
+  annotations:
+    kubernetes.io/ingress.class: nginx
+
+    ##### START FASTCGI INGRESS CONFIG #####
+    nginx.ingress.kubernetes.io/backend-protocol: "FCGI"
+    # nginx.ingress.kubernetes.io/fastcgi-index: "index.php" # OPTIONAL
+    nginx.ingress.kubernetes.io/fastcgi-params-configmap: "ingress-config-map"
+    # cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    # nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+    ##### END FASTCGI INGRESS CONFIG #####
+
+    ##### START HTTP INGRESS WITH GLOBAL NGINX CONFIG #####
+    nginx.ingress.kubernetes.io/use-regex: 'true'
+    nginx.ingress.kubernetes.io/rewrite-target: /$1
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+    ##### END HTTP INGRESS WITH GLOBAL NGINX CONFIG #####
+
+    ##### START HTTP INGRESS WITH LOCAL NGINX CONFIG #####
+    # nginx.ingress.kubernetes.io/use-regex: 'true'
+    # nginx.ingress.kubernetes.io/rewrite-target: /$1
+    # cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    # nginx.ingress.kubernetes.io/ssl-redirect: 'true'
+    ##### START HTTP INGRESS WITH LOCAL NGINX CONFIG #####
+
+spec:
+  tls:
+    - hosts:
+        - hughmaltby.com
+        - www.hughmaltby.com
+        - api.hughmaltby.com
+      secretName: hughmaltby-com
+
+  ##### START FASTCGI INGRESS #####
+  rules:
+    - host: hughmaltby.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: api-cluster-ip-service
+                port:
+                  number: 9000
+    - host: www.hughmaltby.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: api-cluster-ip-service
+                port:
+                  number: 9000
+  ##### END FASTCGI INGRESS #####
+
+  ##### START HTTP INGRESS WITH GLOBAL NGINX CONFIG #####
+  # rules:
+  #   - host: hughmaltby.com
+  #     http:
+  #       paths:
+  #         - path: /?(.*)
+  #           pathType: Prefix
+  #           backend:
+  #             service:
+  #               name: api-cluster-ip-service
+  #               port:
+  #                 number: 9000
+  #   - host: www.hughmaltby.com
+  #     http:
+  #       paths:
+  #         - path: /?(.*)
+  #           pathType: Prefix
+  #           backend:
+  #             service:
+  #               name: api-cluster-ip-service
+  #               port:
+  #                 number: 9000
+  ##### END FASTCGI INGRESS #####
+
+  ##### START HTTP INGRESS WITH LOCALIZED NGINX CONFIG #####
+  # rules:
+  #   - host: hughmaltby.com
+  #     http:
+  #       paths:
+  #         - path: /?(.*)
+  #           pathType: Prefix
+  #           backend:
+  #             service:
+  #               name: client-cluster-ip-service
+  #               port:
+  #                 number: 3000
+  #   - host: www.hughmaltby.com
+  #     http:
+  #       paths:
+  #         - path: /?(.*)
+  #           pathType: Prefix
+  #           backend:
+  #             service:
+  #               name: client-cluster-ip-service
+  #               port:
+  #                 number: 3000
+  #   - host: api.hughmaltby.com
+  #     http:
+  #       paths:
+  #         - path: /?(.*)
+  #           pathType: Prefix
+  #           backend:
+  #             service:
+  #               name: api-nginx-cluster-ip-service
+  #               port:
+  #                 number: 80
+  ##### END HTTP INGRESS WITH LOCALIZED NGINX CONFIG #####
+
+
+
+

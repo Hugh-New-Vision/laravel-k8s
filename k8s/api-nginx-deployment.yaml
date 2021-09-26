@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: api-nginx-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      component: api-nginx
+  template:
+    metadata:
+      labels:
+        component: api-nginx
+    spec:
+      securityContext:
+        fsGroup: 82
+      containers:
+      - name: php-fpm
+        image: maltbyhugh/k8s-api:latest
+        imagePullPolicy: Always
+        securityContext:
+          runAsUser: 82
+          readOnlyRootFilesystem: true
+        ports:
+        - containerPort: 9000
+          name: http
+          protocol: TCP
+        volumeMounts:
+          - name: logs
+            mountPath: /var/www/html/storage/logs
+          - name: cache
+            mountPath: /var/www/html/storage/framework/cache
+          - name: sessions
+            mountPath: /var/www/html/storage/framework/sessions
+          - name: views
+            mountPath: /var/www/html/storage/framework/views
+          - name: testing
+            mountPath: /var/www/html/storage/framework/testing
+      - name: nginx
+        image: nginx:alpine
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
+        volumeMounts:
+        - name: nginx-config-volume
+          mountPath: /etc/nginx/conf.d/default.conf
+          subPath: default.conf
+      volumes:
+      - name: logs
+        emptyDir: {}
+      - name: cache
+        emptyDir: {}
+      - name: testing
+        emptyDir: {}
+      - name: sessions
+        emptyDir: {}
+      - name: views
+        emptyDir: {}
+      - name: nginx-config-volume
+        configMap:
+          name: nginx-config-map
